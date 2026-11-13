@@ -10,6 +10,7 @@ const STATUS_SPEC = [
   { key: "modelThink", rank: 0 },
   { key: "tps", rank: 2 },
   { key: "contextUsage", rank: 0 },
+  { key: "usageBars", rank: 3 },
 ] as const;
 
 /** Display order and drop priority for the accounting line (line 2). */
@@ -89,11 +90,7 @@ export const defaultAssembler: LayoutAssembler = (segments, width, theme) => {
   const line1 = assembleLine(segments, STATUS_SPEC, sep, width);
   // Line 2 — session / accounting (git, cost + provider always survive)
   const line2 = assembleLine(segments, ACCOUNTING_SPEC, sep, width);
-  // Line 3 — quota bars only (separate line so it doesn't crowd accounting)
-  const line3 = segments["usageBars"] || "";
-
-  const lines = [padLine(line1), padLine(line2)].filter(
+  return [padLine(line1), padLine(line2)].filter(
     (line) => visibleWidth(line) > 0,
   );
-  return visibleWidth(line3) > 0 ? [...lines, truncateToWidth(line3, width)] : lines;
 };

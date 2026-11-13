@@ -321,6 +321,27 @@ test("provider renders on the accounting line next to cost", () => {
   assert.match(lines[1]!, /\$0\.04.*commandcode/);
 });
 
+test("usage bars follow context on the first line and hide when space is insufficient", () => {
+  const theme = { fg: (_color: string, text: string) => text } as never;
+  const segs = {
+    modelThink: "codex:med",
+    contextUsage: "context 42%",
+    usageBars: "Week 25%",
+    cost: "$0.04",
+    provider: "openai-codex",
+  } as never;
+
+  const wide = defaultAssembler(segs, 80, theme);
+  assert.equal(wide.length, 2);
+  assert.equal(wide[0]!.trimEnd(), "codex:med ▸ context 42% ▸ Week 25%");
+  assert.match(wide[1]!, /\$0\.04.*openai-codex/);
+
+  const narrow = defaultAssembler(segs, 25, theme);
+  assert.equal(narrow.length, 2);
+  assert.equal(narrow[0]!.trimEnd(), "codex:med ▸ context 42%");
+  assert.doesNotMatch(narrow.join("\n"), /Week/);
+});
+
 test("narrow screens drop turn counter and tps before the context gauge", () => {
   const theme = { fg: (_color: string, text: string) => text } as never;
   const segs = {
